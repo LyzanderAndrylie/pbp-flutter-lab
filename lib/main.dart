@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'counter_7',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Program Counter'),
     );
   }
 }
@@ -49,6 +49,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  String _jenisBilangan = "GENAP";
 
   void _incrementCounter() {
     setState(() {
@@ -58,7 +59,29 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
+      _setJenisBilanganCounter();
     });
+  }
+
+  void _decrementCounter() {
+    setState(() {
+      if (_counter != 0) {
+        setState(() {
+          _counter--;
+          _setJenisBilanganCounter();
+        });
+      }
+    });
+  }
+
+  void _setJenisBilanganCounter() {
+    // setState(() {
+    if (_counter % 2 == 0) {
+      _jenisBilangan = "GENAP";
+    } else {
+      _jenisBilangan = "GANJIL";
+    }
+    // });
   }
 
   @override
@@ -95,8 +118,14 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+            Text(
+              _jenisBilangan,
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: (_counter % 2 == 0)
+                      ? const Color.fromARGB(255, 255, 0, 0)
+                      : const Color.fromARGB(255, 0, 0, 255)),
             ),
             Text(
               '$_counter',
@@ -105,11 +134,23 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: Padding(
+          padding: const EdgeInsets.only(left: 30),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              FloatingActionButton(
+                onPressed: _decrementCounter,
+                tooltip: 'Decrement',
+                child: const Icon(Icons.remove),
+              ),
+              FloatingActionButton(
+                onPressed: _incrementCounter,
+                tooltip: 'Increment',
+                child: const Icon(Icons.add),
+              ),
+            ],
+          )), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
