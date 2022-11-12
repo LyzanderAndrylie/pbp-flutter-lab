@@ -7,16 +7,20 @@ class MyFormPage extends StatefulWidget {
   const MyFormPage({super.key});
 
   @override
-  State<MyFormPage> createState() => _MyFormPageState();
+  State<MyFormPage> createState() => MyFormPageState();
 }
 
-class _MyFormPageState extends State<MyFormPage> {
+class MyFormPageState extends State<MyFormPage> {
   final _formKey = GlobalKey<FormState>();
   String _judulBudget = "";
   int _nomimalBudget = 0;
   String? _jenisBudget;
   List<String> _listJenisBudget = ["Pemasukan", "Pengeluaran"];
-  List<Budget> budgets = [];
+  static List<Budget> budgets = [];
+
+  List<Budget> get getBudgets {
+    return budgets;
+  }
 
   @override
   Widget build(BuildContext context) {

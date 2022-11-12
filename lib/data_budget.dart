@@ -10,8 +10,29 @@ class MyDataBudget extends StatefulWidget {
 }
 
 class _MyDataBudgetState extends State<MyDataBudget> {
+  List<Widget> listDataBudget = [];
+
+  void addDataBudget() {
+    setState(() {
+      for (var i = 0; i < MyFormPageState.budgets.length; i++) {
+        Budget data = MyFormPageState.budgets[i];
+        listDataBudget.add(Padding(
+            padding: EdgeInsets.only(top: 5, bottom: 5),
+            child: Card(
+                child: ListTile(
+              title: Text(data.judul),
+              subtitle: Text('${data.nomimal}'),
+              trailing: Text(data.jenis),
+            ))));
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (listDataBudget.isEmpty) {
+      addDataBudget();
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text("Data Budget"),
@@ -54,14 +75,19 @@ class _MyDataBudgetState extends State<MyDataBudget> {
           ],
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text("Data Budget"),
-          ],
-        ),
-      ),
+      body: Column(children: [
+        Container(
+          padding: const EdgeInsets.all(20),
+          height: 500,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: listDataBudget,
+            ),
+          ),
+        )
+      ]),
     );
   }
 }
