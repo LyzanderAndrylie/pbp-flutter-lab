@@ -1,3 +1,4 @@
+import 'package:counter_7/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:counter_7/main.dart';
 import 'package:counter_7/data_budget.dart';
@@ -14,6 +15,8 @@ class MyFormPageState extends State<MyFormPage> {
   final _formKey = GlobalKey<FormState>();
   String _judulBudget = "";
   int _nomimalBudget = 0;
+  DateTime _tanggalPembuatan = DateTime.now();
+
   String? _jenisBudget;
   List<String> _listJenisBudget = ["Pemasukan", "Pengeluaran"];
   static List<Budget> budgets = [];
@@ -28,49 +31,13 @@ class MyFormPageState extends State<MyFormPage> {
       appBar: AppBar(
         title: const Text('Form Budget'),
       ),
-      drawer: Drawer(
-        child: Column(
-          children: [
-            // Menambahkan clickable menu
-            ListTile(
-              title: const Text('counter_7'),
-              onTap: () {
-                // Route menu ke halaman utama
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MyHomePage()),
-                );
-              },
-            ),
-            ListTile(
-              title: const Text('Tambah Budget'),
-              onTap: () {
-                // Route menu ke halaman form
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MyFormPage()),
-                );
-              },
-            ),
-            ListTile(
-              title: const Text('Data Budget'),
-              onTap: () {
-                // Route menu ke halaman form
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MyDataBudget()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      drawer: const MyDrawer(),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
           child: Container(
               padding: const EdgeInsets.all(20.0),
-              height: 500,
+              height: 600,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -143,35 +110,74 @@ class MyFormPageState extends State<MyFormPage> {
                             return null;
                           },
                         )),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 200,
-                          child: DropdownButtonFormField(
-                            hint: const Text("Pilih jenis"),
-                            value: _jenisBudget,
-                            icon: const Icon(Icons.keyboard_arrow_down),
-                            items: _listJenisBudget.map((String items) {
-                              return DropdownMenuItem(
-                                value: items,
-                                child: Text(items),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                _jenisBudget = newValue!;
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: InputDatePickerFormField(
+                              firstDate: DateTime(2000),
+                              initialDate: _tanggalPembuatan,
+                              lastDate: DateTime(2099),
+                              onDateSubmitted: (value) {
+                                setState(() {
+                                  _tanggalPembuatan = value;
+                                });
+                              },
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.date_range),
+                            onPressed: () {
+                              showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime(2099),
+                              ).then((value) {
+                                if (value != null) {
+                                  setState(() {
+                                    _tanggalPembuatan = value!;
+                                  });
+                                }
                               });
                             },
-                            validator: (String? value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Nominal budget tidak boleh kosong!';
-                              }
-                              return null;
-                            },
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: DropdownButtonFormField(
+                              hint: const Text("Pilih jenis"),
+                              value: _jenisBudget,
+                              icon: const Icon(Icons.keyboard_arrow_down),
+                              items: _listJenisBudget.map((String items) {
+                                return DropdownMenuItem(
+                                  value: items,
+                                  child: Text(items),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  _jenisBudget = newValue!;
+                                });
+                              },
+                              validator: (String? value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Nominal budget tidak boleh kosong!';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ]),
                   Padding(
@@ -193,7 +199,8 @@ class MyFormPageState extends State<MyFormPage> {
                                     budgets.add(Budget(
                                         jenis: _jenisBudget!,
                                         judul: _judulBudget,
-                                        nomimal: _nomimalBudget));
+                                        nomimal: _nomimalBudget,
+                                        tanggalPembuatan: _tanggalPembuatan));
                                   });
 
                                   showDialog(
@@ -217,7 +224,7 @@ class MyFormPageState extends State<MyFormPage> {
                                               Padding(
                                                   padding: EdgeInsets.all(10),
                                                   child: Text(
-                                                    "$_jenisBudget dengan judul $_judulBudget dan harga $_nomimalBudget berhasil ditambahkan",
+                                                    "Tanggal Pembuatan: $_tanggalPembuatan \n $_jenisBudget dengan judul $_judulBudget dan harga $_nomimalBudget berhasil ditambahkan",
                                                     textAlign: TextAlign.center,
                                                   )),
                                               TextButton(
@@ -254,6 +261,11 @@ class Budget {
   String judul;
   int nomimal;
   String jenis;
+  DateTime tanggalPembuatan;
 
-  Budget({required this.jenis, required this.judul, required this.nomimal});
+  Budget(
+      {required this.jenis,
+      required this.judul,
+      required this.nomimal,
+      required this.tanggalPembuatan});
 }

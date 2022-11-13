@@ -1,3 +1,4 @@
+import 'package:counter_7/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:counter_7/main.dart';
 import 'package:counter_7/form_budget.dart';
@@ -17,10 +18,11 @@ class _MyDataBudgetState extends State<MyDataBudget> {
       for (var i = 0; i < MyFormPageState.budgets.length; i++) {
         Budget data = MyFormPageState.budgets[i];
         listDataBudget.add(Padding(
-            padding: EdgeInsets.only(top: 5, bottom: 5),
+            padding: const EdgeInsets.only(top: 5, bottom: 5),
             child: Card(
                 child: ListTile(
-              title: Text(data.judul),
+              title:
+                  Text('${data.judul} (${data.tanggalPembuatan.toString()})'),
               subtitle: Text('${data.nomimal}'),
               trailing: Text(data.jenis),
             ))));
@@ -38,43 +40,7 @@ class _MyDataBudgetState extends State<MyDataBudget> {
         title: const Text("Data Budget"),
       ),
       // Menambahkan drawer menu
-      drawer: Drawer(
-        child: Column(
-          children: [
-            // Menambahkan clickable menu
-            ListTile(
-              title: const Text('counter_7'),
-              onTap: () {
-                // Route menu ke halaman utama
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MyHomePage()),
-                );
-              },
-            ),
-            ListTile(
-              title: const Text('Tambah Budget'),
-              onTap: () {
-                // Route menu ke halaman form
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MyFormPage()),
-                );
-              },
-            ),
-            ListTile(
-              title: const Text('Data Budget'),
-              onTap: () {
-                // Route menu ke halaman form
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MyDataBudget()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      drawer: const MyDrawer(),
       body: Column(children: [
         Container(
           padding: const EdgeInsets.all(20),
