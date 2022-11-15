@@ -1,6 +1,5 @@
 import 'package:counter_7/drawer.dart';
 import 'package:flutter/material.dart';
-import 'package:counter_7/main.dart';
 import 'package:counter_7/form_budget.dart';
 
 class MyDataBudget extends StatefulWidget {
@@ -36,15 +35,14 @@ class _MyDataBudgetState extends State<MyDataBudget> {
       addDataBudget();
     }
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Data Budget"),
-      ),
-      // Menambahkan drawer menu
-      drawer: const MyDrawer(),
-      body: Column(children: [
-        Container(
+        appBar: AppBar(
+          title: const Text("Data Budget"),
+        ),
+        // Menambahkan drawer menu
+        drawer: const MyDrawer(),
+        body: Container(
           padding: const EdgeInsets.all(20),
-          height: 500,
+          height: 800,
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -52,8 +50,6 @@ class _MyDataBudgetState extends State<MyDataBudget> {
               children: listDataBudget,
             ),
           ),
-        )
-      ]),
-    );
+        ));
   }
 }

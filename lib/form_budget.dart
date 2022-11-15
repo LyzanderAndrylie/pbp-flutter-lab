@@ -1,7 +1,5 @@
 import 'package:counter_7/drawer.dart';
 import 'package:flutter/material.dart';
-import 'package:counter_7/main.dart';
-import 'package:counter_7/data_budget.dart';
 import 'package:flutter/services.dart';
 
 class MyFormPage extends StatefulWidget {
@@ -18,7 +16,7 @@ class MyFormPageState extends State<MyFormPage> {
   DateTime _tanggalPembuatan = DateTime.now();
 
   String? _jenisBudget;
-  List<String> _listJenisBudget = ["Pemasukan", "Pengeluaran"];
+  final List<String> _listJenisBudget = ["Pemasukan", "Pengeluaran"];
   static List<Budget> budgets = [];
 
   List<Budget> get getBudgets {
@@ -111,7 +109,7 @@ class MyFormPageState extends State<MyFormPage> {
                           },
                         )),
                     Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -138,7 +136,7 @@ class MyFormPageState extends State<MyFormPage> {
                               ).then((value) {
                                 if (value != null) {
                                   setState(() {
-                                    _tanggalPembuatan = value!;
+                                    _tanggalPembuatan = value;
                                   });
                                 }
                               });
@@ -148,7 +146,7 @@ class MyFormPageState extends State<MyFormPage> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -212,29 +210,27 @@ class MyFormPageState extends State<MyFormPage> {
                                               BorderRadius.circular(10),
                                         ),
                                         elevation: 15,
-                                        child: Container(
-                                          child: ListView(
-                                            padding: const EdgeInsets.only(
-                                                top: 20, bottom: 20),
-                                            shrinkWrap: true,
-                                            children: <Widget>[
-                                              const Center(
-                                                  child:
-                                                      Text('Informasi Data')),
-                                              Padding(
-                                                  padding: EdgeInsets.all(10),
-                                                  child: Text(
-                                                    "Tanggal Pembuatan: $_tanggalPembuatan \n $_jenisBudget dengan judul $_judulBudget dan harga $_nomimalBudget berhasil ditambahkan",
-                                                    textAlign: TextAlign.center,
-                                                  )),
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: const Text('Kembali'),
-                                              ),
-                                            ],
-                                          ),
+                                        child: ListView(
+                                          padding: const EdgeInsets.only(
+                                              top: 20, bottom: 20),
+                                          shrinkWrap: true,
+                                          children: <Widget>[
+                                            const Center(
+                                                child: Text('Informasi Data')),
+                                            Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: Text(
+                                                  "Tanggal Pembuatan: $_tanggalPembuatan \n $_jenisBudget dengan judul $_judulBudget dan harga $_nomimalBudget berhasil ditambahkan",
+                                                  textAlign: TextAlign.center,
+                                                )),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('Kembali'),
+                                            ),
+                                          ],
                                         ),
                                       );
                                     },
