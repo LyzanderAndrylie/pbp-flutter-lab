@@ -1,3 +1,4 @@
+import 'package:counter_7/page/mywatchlist_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -83,18 +84,24 @@ class _MyWatchListPageState extends State<MyWatchListPage> {
                                   BoxShadow(
                                       color: Colors.black, blurRadius: 2.0)
                                 ]),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => MyWatchDetail(
+                                          myWatch: snapshot.data![index])),
+                                );
+                              },
+                              child: Expanded(
+                                child: Text(
                                   "${snapshot.data![index].fields.title}",
                                   style: const TextStyle(
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
                           ));
                 }
