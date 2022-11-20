@@ -9,10 +9,10 @@ class MyWatchListPage extends StatefulWidget {
   const MyWatchListPage({Key? key}) : super(key: key);
 
   @override
-  _MyWatchListPageState createState() => _MyWatchListPageState();
+  MyWatchListPageState createState() => MyWatchListPageState();
 }
 
-class _MyWatchListPageState extends State<MyWatchListPage> {
+class MyWatchListPageState extends State<MyWatchListPage> {
   late Future<List<MyWatchList>> myWatchList;
 
   @override
@@ -93,14 +93,18 @@ class _MyWatchListPageState extends State<MyWatchListPage> {
                                           myWatch: snapshot.data![index])),
                                 );
                               },
-                              child: Expanded(
-                                child: Text(
-                                  "${snapshot.data![index].fields.title}",
-                                  style: const TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      "${snapshot.data![index].fields.title}",
+                                      style: const TextStyle(
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
                           ));
