@@ -1,9 +1,9 @@
-import 'package:counter_7/page/mywatchlist_detail.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+
 import 'package:counter_7/model/mywatchlist.dart';
+import 'package:counter_7/page/mywatchlist_detail.dart';
 import 'package:counter_7/widgets/drawer.dart';
+import 'package:counter_7/utilities/fetch_mywatchlist.dart';
 
 class MyWatchListPage extends StatefulWidget {
   const MyWatchListPage({Key? key}) : super(key: key);
@@ -19,31 +19,6 @@ class MyWatchListPageState extends State<MyWatchListPage> {
   void initState() {
     super.initState();
     myWatchList = fetchMyWatchList();
-  }
-
-  Future<List<MyWatchList>> fetchMyWatchList() async {
-    var url =
-        Uri.parse('http://django-tugas-2-lyz.herokuapp.com/mywatchlist/json/');
-    var response = await http.get(
-      url,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json",
-      },
-    );
-
-    // melakukan decode response menjadi bentuk json
-    var data = jsonDecode(utf8.decode(response.bodyBytes));
-
-    // melakukan konversi data json menjadi object ToDo
-    List<MyWatchList> listMyWatchList = [];
-    for (var d in data) {
-      if (d != null) {
-        listMyWatchList.add(MyWatchList.fromJson(d));
-      }
-    }
-
-    return listMyWatchList;
   }
 
   @override
@@ -87,11 +62,17 @@ class MyWatchListPageState extends State<MyWatchListPage> {
                                   horizontal: 16, vertical: 12),
                               padding: const EdgeInsets.all(20.0),
                               decoration: BoxDecoration(
+                                  border: Border.all(
+                                      width: 1,
+                                      color: ((snapshot
+                                              .data![index].fields.watched)
+                                          ? Colors.green
+                                          : Colors.red)),
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(15.0),
                                   boxShadow: const [
                                     BoxShadow(
-                                        color: Colors.black, blurRadius: 2.0)
+                                        color: Colors.grey, blurRadius: 0.5)
                                   ]),
                               child: Row(
                                 children: [
@@ -104,6 +85,20 @@ class MyWatchListPageState extends State<MyWatchListPage> {
                                       ),
                                     ),
                                   ),
+                                  SizedBox(
+                                    width: 30,
+                                    child: CheckboxListTile(
+                                        value: snapshot
+                                            .data![index].fields.watched,
+                                        onChanged: (bool? value) {
+                                          setState(() {
+                                            snapshot.data![index].fields
+                                                    .watched =
+                                                !snapshot.data![index].fields
+                                                    .watched;
+                                          });
+                                        }),
+                                  )
                                 ],
                               ),
                             ),
