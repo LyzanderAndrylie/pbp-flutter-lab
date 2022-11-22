@@ -36,7 +36,7 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             title: const Text('Data Budget'),
             onTap: () {
-              // Route menu ke halaman form
+              // Route menu ke halaman data
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const MyDataBudget()),
@@ -46,7 +46,7 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             title: const Text('My Watch List'),
             onTap: () {
-              // Route menu ke halaman form
+              // Route menu ke halaman mywatchlist
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(

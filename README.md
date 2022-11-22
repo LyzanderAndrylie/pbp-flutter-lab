@@ -501,3 +501,279 @@ Penambahan dilakukan dengan membuat file `data_budget.dart` dan membuat Stateful
         ));
     }
     ```
+
+# Tugas 9
+
+## Pengambilan data JSON dengan/tanpa Model
+Kita bisa saja melakukan pengambilan data JSON tanpa membuat model terlebih dahulu. Namun, hal ini akan membuat pengolahan data tidak mudah dan tidak efisien karena kita harus memproses respons JSON tersebut secara manual setelah menerima respons dari *web service*. Oleh karena itu, hal tersebut tidaklah lebih baik daripada kita membuat model terlebih dahulu sebelum melakukan pengambilan data JSON.
+
+## Widget-Widget pada Tugas 9
+Widget-widget yang digunakan pada Tugas 9 sama dengan widget-widget pada tugas 7 dan 8. Namun, ada beberapa tambahan widget pada tugas 9, yaitu sebagai berikut.
+1. FutureBuilder() = widget yang membangun dirinya sendiri berdasarkan interaksi snapshot terakhir dengan `Future`.
+2. MyWatchDetail() = widget yang digunakan untuk menampilkan detail dari mywatch
+3. RichText() = widget yang dapat menampilkan text dengan menggunakan beberapa *style* yang berbeda.
+4. GestureDetector() = widget yang dapat mendeteksi gestur pengguna.
+5. ListTile() = Widget yang merepresentasikan satu baris dengan tinggi tetap.
+6. CheckboxListTile() = `ListTile` dengan `Checkbox`.
+
+## Mekanisme Pengambilan data dari JSON dan Menampilkan data pada Flutter
+Mekanisme mengambil dan menapilkan data dari JSON pada Flutter sebagai berikut.
+1. Membuat Model kustom yang sesuai dengan data JSON.
+2. Mengambil data JSON dari *web service* dengan metode `http.get`.
+3. Mengolah data JSON dari *web service* dengan memanfaatkan metode pada Model kustom yang telah dibuat untuk mengubah JSON menjadi objek model kustom.
+4. Menampilkan data dari *web service* yang telah diproses ke widget yang sesuai.
+
+## Implementasi
+1. Menambahkan tombol navigasi pada drawer/hamburger untuk ke halaman mywatchlist.<br>
+Penambahan tombol navigasi pada drawer dilakukan dengan menambahkan kode berikut pada `drawer.dart`.
+    ```dart
+    Drawer(
+      child: Column(
+        children: [
+          ...
+          ListTile(
+            title: const Text('My Watch List'),
+            onTap: () {
+              // Route menu ke halaman mywatchlist
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const MyWatchListPage()),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+    ```
+
+2. Membuat satu file dart yang berisi model mywatchlist<br>
+Hal ini dilakukan dengan memanfaatkan [QuickType](https://app.quicktype.io/) untuk membantu pembuatan model yang menyesuaikan dengan data JSON.
+    ```dart
+    import 'dart:convert';
+
+    List<MyWatchList> myWatchListFromJson(String str) => List<MyWatchList>.from(
+        json.decode(str).map((x) => MyWatchList.fromJson(x)));
+
+    String myWatchListToJson(List<MyWatchList> data) =>
+        json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+
+    class MyWatchList {
+    MyWatchList({
+        required this.model,
+        required this.pk,
+        required this.fields,
+    });
+
+    Model model;
+    int pk;
+    Fields fields;
+
+    factory MyWatchList.fromJson(Map<String, dynamic> json) => MyWatchList(
+            model: modelValues.map[json["model"]]!,
+            pk: json["pk"],
+            fields: Fields.fromJson(json["fields"]),
+        );
+
+    Map<String, dynamic> toJson() => {
+            "model": modelValues.reverse[model],
+            "pk": pk,
+            "fields": fields.toJson(),
+        };
+    }
+
+    class Fields {
+    Fields({
+        required this.watched,
+        required this.title,
+        required this.rating,
+        required this.releaseDate,
+        required this.review,
+    });
+
+    bool watched;
+    String title;
+    int rating;
+    DateTime releaseDate;
+    String review;
+
+    factory Fields.fromJson(Map<String, dynamic> json) => Fields(
+            watched: json["watched"],
+            title: json["title"],
+            rating: json["rating"],
+            releaseDate: DateTime.parse(json["release_date"]),
+            review: json["review"],
+        );
+
+    Map<String, dynamic> toJson() => {
+            "watched": watched,
+            "title": title,
+            "rating": rating,
+            "release_date":
+                "${releaseDate.year.toString().padLeft(4, '0')}-${releaseDate.month.toString().padLeft(2, '0')}-${releaseDate.day.toString().padLeft(2, '0')}",
+            "review": review,
+        };
+    }
+
+    enum Model { MYWATCHLIST_MYWATCHLIST }
+
+    final modelValues =
+        EnumValues(map: {"mywatchlist.mywatchlist": Model.MYWATCHLIST_MYWATCHLIST});
+
+    class EnumValues<T> {
+    Map<String, T> map;
+    Map<T, String>? reverseMap;
+
+    EnumValues({required this.map});
+
+    Map<T, String> get reverse {
+        reverseMap ??= map.map((k, v) => MapEntry(v, k));
+        return reverseMap!;
+    }
+    }
+    ```
+
+3. Menambahkan halaman mywatchlist yang berisi semua watch list yang ada pada endpoint JSON di Django pada [Tugas 3](http://django-tugas-2-lyz.herokuapp.com/mywatchlist/json/)<br>
+Hal ini dilakukan dengan membuat file `mywatchlist_page.dart` yang merupakan `Stateful Widget` untuk menampilkan semua watchlist. Selain itu, fungsi `fetchMyWatchList()` yang didefinisikan pada `fetch_mywatchlist.dart` digunakan untuk mengambil data mywatchlist.
+    ```dart
+    class MyWatchListPageState extends State<MyWatchListPage> {
+    late Future<List<MyWatchList>> myWatchList;
+
+    @override
+    void initState() {
+        super.initState();
+        myWatchList = fetchMyWatchList();
+    }
+
+    @override
+    Widget build(BuildContext context) {
+        return Scaffold(
+            appBar: AppBar(
+            title: const Text('My Watch List'),
+            ),
+            drawer: const MyDrawer(),
+            body: FutureBuilder(
+                future: myWatchList,
+                builder: (context, AsyncSnapshot snapshot) {
+                if (snapshot.data == null) {
+                    return const Center(child: CircularProgressIndicator());
+                } else {
+                    if (!snapshot.hasData) {
+                    return Column(
+                        children: const [
+                        Text(
+                            "Tidak ada MyWatchList :(",
+                            style:
+                                TextStyle(color: Color(0xff59A5D8), fontSize: 20),
+                        ),
+                        SizedBox(height: 8),
+                        ],
+                    );
+                    } else {
+                    return ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (_, index) => GestureDetector(
+                                onTap: () {
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => MyWatchDetail(
+                                            myWatch: snapshot.data![index])),
+                                );
+                                },
+                                child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                                padding: const EdgeInsets.all(20.0),
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 1,
+                                        color: ((snapshot
+                                                .data![index].fields.watched)
+                                            ? Colors.green
+                                            : Colors.red)),
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(15.0),
+                                    boxShadow: const [
+                                        BoxShadow(
+                                            color: Colors.grey, blurRadius: 0.5)
+                                    ]),
+                                child: Row(
+                                    children: [
+                                    Expanded(
+                                        child: Text(
+                                        "${snapshot.data![index].fields.title}",
+                                        style: const TextStyle(
+                                            fontSize: 18.0,
+                                            fontWeight: FontWeight.bold,
+                                        ),
+                                        ),
+                                    ),
+                                    SizedBox(
+                                        width: 30,
+                                        child: CheckboxListTile(
+                                            value: snapshot
+                                                .data![index].fields.watched,
+                                            onChanged: (bool? value) {
+                                            setState(() {
+                                                snapshot.data![index].fields
+                                                        .watched =
+                                                    !snapshot.data![index].fields
+                                                        .watched;
+                                            });
+                                            }),
+                                    )
+                                    ],
+                                ),
+                                ),
+                            ));
+                    }
+                }
+                }));
+    }
+    }
+
+    ```
+
+4. Membuat navigasi dari setiap judul watch list ke halaman detail<br>
+Hal ini dilakukan dengan menggunakan widget `GestureDetector` pada `ListView.builder` dan memanfaatkan properti `onTap` dengan value berupa `fungsi` yang digunakan untuk untuk menavigasi ke halaman detail dari masing-masing judul watchlist.
+    ```
+    GestureDetector(
+        onTap: () {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => MyWatchDetail(
+                    myWatch: snapshot.data![index])),
+        );
+        },
+        child: ...)
+    ```
+
+5. Menambahkan halaman detail untuk setiap mywatchlist<br>
+Hal ini dilakukan dengan membuat file `mywatchlist_detail.dart` yang berfungsi untuk menampilkan halaman detail untuk masing-masing watchlist. Perhatikan bahwa class `MyWatchDetail` memiliki *required parameter* berupa `MyWatchList`. Hal ini bertujuan untuk memanfaatkan objek yang di-*pass* ketika widget `MyWatchDetail` dibuat sehingga widget tersebut dapat menampilkan data dari objek tersebut.
+
+6. Menambahkan tombol untuk kembali ke daftar mywatchlist<br>
+Hal ini dilakukan dengan menambahkan `TextButton` pada build method dari widget `MyWatchDetail` dan memanfaatkan properti `onPressed` dengan value berupa `fungsi` yang digunakan untuk untuk menavigasi kembali ke halaman mywatchlsit.
+    ```dart
+    TextButton(
+        style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Colors.blue),
+        ),
+        onPressed: () {
+            Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const MyWatchListPage()),
+            );
+        },
+        child: const SizedBox(
+            height: 40,
+            width: 200,
+            child: Center(
+                child: Text(
+                "Back",
+                style: TextStyle(color: Colors.white),
+                ),
+            ))),
+    ```
